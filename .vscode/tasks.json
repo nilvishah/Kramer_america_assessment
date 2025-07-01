@@ -1,0 +1,11 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Create React App",
+			"command": "npx create-react-app frontend --template cra-template",
+			"group": "build"
+		}
+	]
+}
