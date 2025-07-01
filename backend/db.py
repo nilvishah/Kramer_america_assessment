@@ -1,3 +1,8 @@
+def delete_fact(fact_id: int) -> bool:
+    with get_connection() as conn:
+        cur = conn.execute('DELETE FROM cat_facts WHERE id = ?', (fact_id,))
+        conn.commit()
+        return cur.rowcount > 0
 import sqlite3
 from typing import List, Optional, Tuple
 
