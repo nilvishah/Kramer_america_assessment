@@ -7,7 +7,7 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch('http://127.0.0.1:8000/catfacts')
+    fetch('/catfacts')
       .then(res => res.json())
       .then(data => {
         setFacts(data);
@@ -24,7 +24,7 @@ function App() {
     }
     const formData = new FormData();
     formData.append('fact', newFact);
-    const res = await fetch('http://127.0.0.1:8000/catfacts', {
+    const res = await fetch('/catfacts', {
       method: 'POST',
       body: formData
     });
