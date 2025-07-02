@@ -96,34 +96,95 @@ function App() {
   `;
 
   return (
-    <div style={{ minHeight: '100vh', background: bgGradient, paddingTop: 0, paddingBottom: 0, margin: 0, position: 'relative', overflow: 'hidden' }}>
-      <style>{transitionStyles}</style>
-      <div style={{ maxWidth: 600, margin: '0 auto', background: cardBg, borderRadius: 16, boxShadow: cardShadow, padding: '2.5rem 2rem', fontFamily: 'Segoe UI, sans-serif', position: 'relative', zIndex: 1 }}>
-        {/* Removed CatPaw3D from the top */}
+  <div style={{
+    height: '100vh',
+    background: bgGradient,
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
+    fontFamily: 'Segoe UI, sans-serif',
+    padding: '0rem'
+  }}>
+    <style>{transitionStyles}</style>
+    <div style={{
+      width: '100%',
+      maxWidth: 600,
+      background: cardBg,
+      borderRadius: 16,
+      boxShadow: cardShadow,
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100%',
+      overflow: 'hidden',
+      padding: '0 2rem 0rem 2rem'
+    }}>
+      {/* Header and form */}
+      <div style={{ flexShrink: 0 }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
-          <h1 style={{ textAlign: 'center', color: '#6366f1', fontWeight: 700, letterSpacing: 1, marginBottom: 0 }}>🐱 Cat Fact Tracker</h1>
+          <h1 style={{ color: '#6366f1', fontWeight: 700 }}>🐱 Cat Fact Tracker</h1>
           <button
             onClick={() => setDarkMode(dm => !dm)}
-            style={{ background: darkMode ? '#6366f1' : '#e0e7ff', color: darkMode ? '#fff' : '#6366f1', border: 'none', borderRadius: 8, padding: '0.5rem 1.2rem', fontWeight: 600, fontSize: 15, cursor: 'pointer', marginLeft: 16 }}
-            aria-label="Toggle dark mode"
+            style={{
+              background: darkMode ? '#6366f1' : '#e0e7ff',
+              color: darkMode ? '#fff' : '#6366f1',
+              border: 'none',
+              borderRadius: 8,
+              padding: '0.5rem 1.2rem',
+              fontWeight: 600,
+              fontSize: 15,
+              cursor: 'pointer'
+            }}
           >
             {darkMode ? '☀️ Light' : '🌙 Dark'}
           </button>
         </div>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 12, marginBottom: 32, alignItems: 'center' }}>
+
+        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
           <input
             type="text"
             value={newFact}
             onChange={e => setNewFact(e.target.value)}
             placeholder="Add a new cat fact"
-            style={{ flex: 1, padding: '0.75rem 1rem', border: `1px solid ${inputBorder}`, borderRadius: 8, fontSize: 16, outline: 'none', background: inputBg, color: textColor }}
+            style={{
+              flex: 1,
+              padding: '0.75rem 1rem',
+              border: `1px solid ${inputBorder}`,
+              borderRadius: 8,
+              fontSize: 16,
+              background: inputBg,
+              color: textColor
+            }}
           />
-          <button type="submit" style={{ background: '#6366f1', color: '#fff', border: 'none', borderRadius: 8, padding: '0.75rem 1.5rem', fontWeight: 600, fontSize: 16, cursor: 'pointer', transition: 'background 0.2s' }}>
+          <button type="submit" style={{
+            background: '#6366f1',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '0.75rem 1.5rem',
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: 'pointer'
+          }}>
             Add
           </button>
         </form>
-        {message && <div style={{ marginBottom: 24, color: message === 'Fact added!' || message === 'Fact deleted!' ? '#16a34a' : '#dc2626', textAlign: 'center', fontWeight: 500 }}>{message}</div>}
-        <h2 style={{ color: textColor, fontWeight: 600, marginBottom: 18, fontSize: 22 }}>All Cat Facts</h2>
+
+        {message && (
+          <div style={{
+            marginBottom: 16,
+            color: message.includes('added') || message.includes('deleted') ? '#16a34a' : '#dc2626',
+            textAlign: 'center',
+            fontWeight: 500
+          }}>
+            {message}
+          </div>
+        )}
+
+        <h2 style={{ color: textColor, fontWeight: 600, marginBottom: 12 }}>All Cat Facts</h2>
+      </div>
+
+      {/* Scrollable list area */}
+      <div style={{ flex: 1, overflowY: 'auto', paddingRight: '0.5rem' }}>
         {loading ? (
           <div style={{ textAlign: 'center', color: '#6366f1', fontSize: 18 }}>Loading...</div>
         ) : facts.length === 0 ? (
@@ -132,75 +193,67 @@ function App() {
           <TransitionGroup component="ul" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {facts.map(f => (
               <CSSTransition key={f.id || f.fact} timeout={350} classNames="fact">
-  <li style={{
-    background: factBg,
-    borderRadius: '1rem',
-    marginBottom: '1rem',
-    padding: '1.2rem 1.5rem',
-    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
-    display: 'flex',
-    flexDirection: 'column',
-    gap: '0.75rem',
-    transition: 'all 0.2s ease-in-out'
-  }}>
-    <p style={{
-      margin: 0,
-      fontSize: '1.05rem',
-      color: textColor,
-      lineHeight: 1.6
-    }}>
-      {f.fact}
-    </p>
-
-    <div style={{
-      display: 'flex',
-      justifyContent: 'space-between',
-      alignItems: 'center',
-      fontSize: 14,
-      color: darkMode ? '#a5b4fc' : '#64748b'
-    }}>
-      <span>{f.created_at}</span>
-      <div style={{ display: 'flex', gap: '0.75rem' }}>
-        <button
-          title="Like"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: '#ef4444',
-            fontSize: '1.1rem',
-            fontWeight: 600,
-            cursor: 'pointer',
-            transition: 'transform 0.2s ease',
-          }}
-          onClick={() => {}}
-        >
-          ❤️ {f.likes || 0}
-        </button>
-        <button
-          onClick={() => handleDelete(f.id)}
-          title="Delete"
-          style={{
-            background: 'transparent',
-            border: 'none',
-            color: darkMode ? '#fca5a5' : '#dc2626',
-            fontSize: '1.1rem',
-            cursor: 'pointer',
-            transition: 'color 0.2s ease',
-          }}
-        >
-          🗑️
-        </button>
-      </div>
-    </div>
-  </li>
+                <li style={{
+                  background: factBg,
+                  borderRadius: '1rem',
+                  marginBottom: '1rem',
+                  padding: '1.2rem 1.5rem',
+                  boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  gap: '0.75rem'
+                }}>
+                  <p style={{ margin: 0, fontSize: '1.05rem', color: textColor }}>
+                    {f.fact}
+                  </p>
+                  <div style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    fontSize: 14,
+                    color: darkMode ? '#a5b4fc' : '#64748b'
+                  }}>
+                    <span>{f.created_at}</span>
+                    <div style={{ display: 'flex', gap: '0.75rem' }}>
+                      <button
+                        title="Like"
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#ef4444',
+                          fontSize: '1.1rem',
+                          fontWeight: 600,
+                          cursor: 'pointer'
+                        }}
+                        onClick={() => { }}
+                      >
+                        ❤️ {f.likes || 0}
+                      </button>
+                      <button
+                        onClick={() => handleDelete(f.id)}
+                        title="Delete"
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: darkMode ? '#fca5a5' : '#dc2626',
+                          fontSize: '1.1rem',
+                          cursor: 'pointer'
+                        }}
+                      >
+                        🗑️
+                      </button>
+                    </div>
+                  </div>
+                </li>
               </CSSTransition>
-
             ))}
           </TransitionGroup>
         )}
       </div>
     </div>
-  );
+  </div>
+);
+
 }
 
 export default App;
