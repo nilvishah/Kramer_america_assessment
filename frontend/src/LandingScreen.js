@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+// import { useTheme } from './ThemeContext';
 import { useNavigate } from 'react-router-dom';
 import Lottie from 'lottie-react';
 import paw from './assets/paw.svg';
@@ -11,11 +12,12 @@ const LandingScreen = () => {
   const navigate = useNavigate();
   const [answer, setAnswer] = useState(null); // null | "yes" | "no"
 
+  const bgGradient = 'linear-gradient(to top right, #fff7fb, #e0f7fa)';
   return (
     <div style={{
       height: '100vh',
       overflow: 'hidden',
-      background: 'linear-gradient(to top right, #fff7fb, #e0f7fa)',
+      background: bgGradient,
       position: 'relative',
       display: 'flex',
       flexDirection: 'column',
