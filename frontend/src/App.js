@@ -1,5 +1,5 @@
-
 import React, { useEffect, useState } from 'react';
+// import { useTheme } from './ThemeContext';
 import CatPaw3D from './CatPaw3D';
 import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
@@ -8,8 +8,10 @@ function App() {
   const [newFact, setNewFact] = useState('');
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
-  const [darkMode, setDarkMode] = useState(false);
   const [pawAction, setPawAction] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [editingValue, setEditingValue] = useState('');
+
 
   useEffect(() => {
     fetch('/catfacts')
@@ -60,17 +62,83 @@ function App() {
     }
   };
 
-  // Styles for light and dark mode
-  const bgGradient = darkMode
-    ? 'linear-gradient(135deg, #18181b 0%, #312e81 100%)'
-    : 'linear-gradient(135deg, #f8fafc 0%, #e0e7ff 100%)';
-  const cardBg = darkMode ? '#232336' : '#fff';
-  const cardShadow = darkMode ? '0 4px 24px #312e8155' : '0 4px 24px #c7d2fe55';
-  const textColor = darkMode ? '#e0e7ff' : '#334155';
-  const inputBg = darkMode ? '#232336' : '#f1f5f9';
-  const inputBorder = darkMode ? '#6366f1' : '#c7d2fe';
-  const factBg = darkMode ? '#18181b' : '#f1f5f9';
-  const deleteBtnBg = darkMode ? '#ef4444' : '#dc2626';
+  // Export to CSV handler
+  const handleExportCSV = () => {
+    if (!facts.length) return;
+    const header = ['id', 'fact', 'created_at'];
+    const rows = facts.map(f => [f.id, '"' + (f.fact || '').replace(/"/g, '""') + '"', f.created_at]);
+    const csvContent = [header, ...rows]
+      .map(e => e.join(','))
+      .join('\n');
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    let filename = window.prompt('Enter a filename for your CSV (without extension):', 'cat_facts_export');
+    if (filename === null) {
+      // User cancelled the prompt, do not download
+      URL.revokeObjectURL(url);
+      return;
+    }
+    if (!filename) {
+      filename = 'cat_facts_export';
+    }
+    if (!filename.endsWith('.csv')) {
+      filename += '.csv';
+    }
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
+  // Inline edit handlers
+  const startEditFact = (factObj) => {
+    setEditingId(factObj.id);
+    setEditingValue(factObj.fact);
+  };
+
+  const cancelEditFact = () => {
+    setEditingId(null);
+    setEditingValue('');
+  };
+
+  const saveEditFact = (factObj) => {
+    const newFact = editingValue.trim();
+    if (!newFact || newFact === factObj.fact) {
+      cancelEditFact();
+      return;
+    }
+    fetch(`/catfacts/${factObj.id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fact: newFact })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data && data.success) {
+          setFacts(facts.map(f => f.id === factObj.id ? { ...f, fact: newFact } : f));
+          setMessage('Fact updated!');
+        } else {
+          setMessage(data.message || 'Error updating fact');
+        }
+        cancelEditFact();
+      })
+      .catch(() => {
+        setMessage('Error updating fact');
+        cancelEditFact();
+      });
+  };
+
+  // Styles for light mode only (consistent with landing page)
+  const bgGradient = 'linear-gradient(to top right, #fff7fb, #e0f7fa)';
+  const cardBg = '#fff';
+  const cardShadow = '0 4px 24px #c7d2fe55';
+  const textColor = '#334155';
+  const inputBg = '#f1f5f9';
+  const inputBorder = '#c7d2fe';
+  const factBg = '#f1f5f9';
+  const deleteBtnBg = '#dc2626';
   const deleteBtnColor = '#fff';
 
   // Animation CSS
@@ -120,23 +188,8 @@ function App() {
     }}>
       {/* Header and form */}
       <div style={{ flexShrink: 0 }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', marginBottom: 24 }}>
           <h1 style={{ color: '#6366f1', fontWeight: 700 }}>🐱 Cat Fact Tracker</h1>
-          <button
-            onClick={() => setDarkMode(dm => !dm)}
-            style={{
-              background: darkMode ? '#6366f1' : '#e0e7ff',
-              color: darkMode ? '#fff' : '#6366f1',
-              border: 'none',
-              borderRadius: 8,
-              padding: '0.5rem 1.2rem',
-              fontWeight: 600,
-              fontSize: 15,
-              cursor: 'pointer'
-            }}
-          >
-            {darkMode ? '☀️ Light' : '🌙 Dark'}
-          </button>
         </div>
 
         <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
@@ -167,6 +220,18 @@ function App() {
           }}>
             Add
           </button>
+          <button type="button" onClick={handleExportCSV} style={{
+            background: '#10b981',
+            color: '#fff',
+            border: 'none',
+            borderRadius: 8,
+            padding: '0.75rem 1.5rem',
+            fontWeight: 600,
+            fontSize: 16,
+            cursor: 'pointer'
+          }}>
+            Export to CSV
+          </button>
         </form>
 
         {message && (
@@ -188,7 +253,7 @@ function App() {
         {loading ? (
           <div style={{ textAlign: 'center', color: '#6366f1', fontSize: 18 }}>Loading...</div>
         ) : facts.length === 0 ? (
-          <div style={{ textAlign: 'center', color: darkMode ? '#a5b4fc' : '#64748b', fontSize: 16 }}>No cat facts found.</div>
+          <div style={{ textAlign: 'center', color: '#64748b', fontSize: 16 }}>No cat facts found.</div>
         ) : (
           <TransitionGroup component="ul" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {facts.map(f => (
@@ -203,18 +268,59 @@ function App() {
                   flexDirection: 'column',
                   gap: '0.75rem'
                 }}>
-                  <p style={{ margin: 0, fontSize: '1.05rem', color: textColor }}>
-                    {f.fact}
-                  </p>
+                  {editingId === f.id ? (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <input
+                        type="text"
+                        value={editingValue}
+                        onChange={e => setEditingValue(e.target.value)}
+                        style={{
+                          flex: 1,
+                          fontSize: '1.05rem',
+                          padding: '0.3rem 0.5rem',
+                          border: `1px solid ${inputBorder}`,
+                          borderRadius: 6,
+                          color: textColor
+                        }}
+                        autoFocus
+                        onKeyDown={e => {
+                          if (e.key === 'Enter') saveEditFact(f);
+                          if (e.key === 'Escape') cancelEditFact();
+                        }}
+                      />
+                      <button onClick={() => saveEditFact(f)} style={{ marginLeft: 4, color: '#10b981', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer' }} title="Save">✔️</button>
+                      <button onClick={cancelEditFact} style={{ color: '#dc2626', background: 'none', border: 'none', fontSize: 18, cursor: 'pointer' }} title="Cancel">✖️</button>
+                    </div>
+                  ) : (
+                    <p style={{ margin: 0, fontSize: '1.05rem', color: textColor }}>
+                      {f.fact}
+                    </p>
+                  )}
                   <div style={{
                     display: 'flex',
                     justifyContent: 'space-between',
                     alignItems: 'center',
                     fontSize: 14,
-                    color: darkMode ? '#a5b4fc' : '#64748b'
+                    // color: darkMode ? '#a5b4fc' : '#64748b'
                   }}>
                     <span>{f.created_at}</span>
-                    <div style={{ display: 'flex', gap: '0.75rem' }}>
+                    <div style={{ display: 'flex', gap: '0.75rem', alignItems: 'center' }}>
+                      {/* Edit icon */}
+                      <button
+                        onClick={() => startEditFact(f)}
+                        title="Edit"
+                        style={{
+                          background: 'transparent',
+                          border: 'none',
+                          color: '#6366f1',
+                          fontSize: '1.1rem',
+                          cursor: 'pointer',
+                          marginRight: '0.5rem'
+                        }}
+                        disabled={editingId !== null && editingId !== f.id}
+                      >
+                        ✏️
+                      </button>
                       <button
                         title="Like"
                         style={{
@@ -235,7 +341,7 @@ function App() {
                         style={{
                           background: 'transparent',
                           border: 'none',
-                          color: darkMode ? '#fca5a5' : '#dc2626',
+                          color: '#dc2626',
                           fontSize: '1.1rem',
                           cursor: 'pointer'
                         }}
