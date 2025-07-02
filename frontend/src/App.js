@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
 
+import React, { useEffect, useState } from 'react';
+import CatPaw3D from './CatPaw3D';
+import { TransitionGroup, CSSTransition } from 'react-transition-group';
 
 function App() {
   const [facts, setFacts] = useState([]);
@@ -7,6 +9,7 @@ function App() {
   const [message, setMessage] = useState('');
   const [loading, setLoading] = useState(true);
   const [darkMode, setDarkMode] = useState(false);
+  const [pawAction, setPawAction] = useState(false);
 
   useEffect(() => {
     fetch('/catfacts')
@@ -35,6 +38,8 @@ function App() {
       setFacts([...facts, { id: facts.length + 1, fact: newFact, created_at: new Date().toISOString().slice(0,10) }]);
       setNewFact('');
       setMessage('Fact added!');
+      setPawAction(true);
+      setTimeout(() => setPawAction(false), 500);
     } else {
       setMessage(data.message || 'Error');
     }
@@ -48,6 +53,8 @@ function App() {
     if (res.ok) {
       setFacts(facts.filter(f => f.id !== id));
       setMessage("Fact deleted!");
+      setPawAction(true);
+      setTimeout(() => setPawAction(false), 500);
     } else {
       setMessage(data.message || "Error deleting fact");
     }
@@ -66,9 +73,33 @@ function App() {
   const deleteBtnBg = darkMode ? '#ef4444' : '#dc2626';
   const deleteBtnColor = '#fff';
 
+  // Animation CSS
+  const transitionStyles = `
+    .fact-enter {
+      opacity: 0;
+      transform: translateY(20px) scale(0.95);
+    }
+    .fact-enter-active {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      transition: opacity 350ms, transform 350ms;
+    }
+    .fact-exit {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    .fact-exit-active {
+      opacity: 0;
+      transform: translateY(-20px) scale(0.95);
+      transition: opacity 350ms, transform 350ms;
+    }
+  `;
+
   return (
-    <div style={{ minHeight: '100vh', background: bgGradient, padding: 0, margin: 0 }}>
-      <div style={{ maxWidth: 600, margin: '3rem auto', background: cardBg, borderRadius: 16, boxShadow: cardShadow, padding: '2.5rem 2rem', fontFamily: 'Segoe UI, sans-serif' }}>
+    <div style={{ minHeight: '100vh', background: bgGradient, paddingTop: 0, paddingBottom: 0, margin: 0, position: 'relative', overflow: 'hidden' }}>
+      <style>{transitionStyles}</style>
+      <div style={{ maxWidth: 600, margin: '0 auto', background: cardBg, borderRadius: 16, boxShadow: cardShadow, padding: '2.5rem 2rem', fontFamily: 'Segoe UI, sans-serif', position: 'relative', zIndex: 1 }}>
+        {/* Removed CatPaw3D from the top */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
           <h1 style={{ textAlign: 'center', color: '#6366f1', fontWeight: 700, letterSpacing: 1, marginBottom: 0 }}>🐱 Cat Fact Tracker</h1>
           <button
@@ -79,7 +110,7 @@ function App() {
             {darkMode ? '☀️ Light' : '🌙 Dark'}
           </button>
         </div>
-        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 12, marginBottom: 32 }}>
+        <form onSubmit={handleSubmit} style={{ display: 'flex', gap: 12, marginBottom: 32, alignItems: 'center' }}>
           <input
             type="text"
             value={newFact}
@@ -98,15 +129,74 @@ function App() {
         ) : facts.length === 0 ? (
           <div style={{ textAlign: 'center', color: darkMode ? '#a5b4fc' : '#64748b', fontSize: 16 }}>No cat facts found.</div>
         ) : (
-          <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          <TransitionGroup component="ul" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
             {facts.map(f => (
-              <li key={f.id || f.fact} style={{ background: factBg, borderRadius: 8, marginBottom: 12, padding: '1rem 1.25rem', display: 'flex', alignItems: 'center', boxShadow: darkMode ? '0 1px 4px #312e8122' : '0 1px 4px #c7d2fe22' }}>
-                <span style={{ flex: 1, color: textColor, fontSize: 16 }}>{f.fact}</span>
-                <span style={{ color: '#6366f1', fontSize: 13, marginLeft: 16 }}>{f.created_at}</span>
-                <button onClick={() => handleDelete(f.id)} style={{ marginLeft: 16, background: deleteBtnBg, color: deleteBtnColor, border: 'none', borderRadius: 6, padding: '0.4rem 0.9rem', fontWeight: 500, fontSize: 14, cursor: 'pointer', transition: 'background 0.2s' }}>Delete</button>
-              </li>
+              <CSSTransition key={f.id || f.fact} timeout={350} classNames="fact">
+  <li style={{
+    background: factBg,
+    borderRadius: '1rem',
+    marginBottom: '1rem',
+    padding: '1.2rem 1.5rem',
+    boxShadow: '0 4px 12px rgba(0,0,0,0.05)',
+    display: 'flex',
+    flexDirection: 'column',
+    gap: '0.75rem',
+    transition: 'all 0.2s ease-in-out'
+  }}>
+    <p style={{
+      margin: 0,
+      fontSize: '1.05rem',
+      color: textColor,
+      lineHeight: 1.6
+    }}>
+      {f.fact}
+    </p>
+
+    <div style={{
+      display: 'flex',
+      justifyContent: 'space-between',
+      alignItems: 'center',
+      fontSize: 14,
+      color: darkMode ? '#a5b4fc' : '#64748b'
+    }}>
+      <span>{f.created_at}</span>
+      <div style={{ display: 'flex', gap: '0.75rem' }}>
+        <button
+          title="Like"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: '#ef4444',
+            fontSize: '1.1rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            transition: 'transform 0.2s ease',
+          }}
+          onClick={() => {}}
+        >
+          ❤️ {f.likes || 0}
+        </button>
+        <button
+          onClick={() => handleDelete(f.id)}
+          title="Delete"
+          style={{
+            background: 'transparent',
+            border: 'none',
+            color: darkMode ? '#fca5a5' : '#dc2626',
+            fontSize: '1.1rem',
+            cursor: 'pointer',
+            transition: 'color 0.2s ease',
+          }}
+        >
+          🗑️
+        </button>
+      </div>
+    </div>
+  </li>
+              </CSSTransition>
+
             ))}
-          </ul>
+          </TransitionGroup>
         )}
       </div>
     </div>

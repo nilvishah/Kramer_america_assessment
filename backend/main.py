@@ -3,6 +3,11 @@
 from fastapi import FastAPI, Form, Path
 from fastapi.middleware.cors import CORSMiddleware
 from db import create_table, get_all_facts, get_random_fact, insert_fact, delete_fact
+
+# ...existing code...
+
+
+
 from fastapi.responses import JSONResponse
 
 # ...existing code...

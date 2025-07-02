@@ -1,3 +1,7 @@
+def clear_facts():
+    with get_connection() as conn:
+        conn.execute('DELETE FROM cat_facts')
+        conn.commit()
 def delete_fact(fact_id: int) -> bool:
     with get_connection() as conn:
         cur = conn.execute('DELETE FROM cat_facts WHERE id = ?', (fact_id,))
@@ -32,9 +36,12 @@ def insert_fact(fact: str) -> bool:
     except sqlite3.IntegrityError:
         return False
 
-def get_all_facts() -> List[Tuple[int, str, str]]:
+
+def get_all_facts(limit: int = 5) -> List[Tuple[int, str, str]]:
     with get_connection() as conn:
-        return conn.execute('SELECT id, fact, created_at FROM cat_facts').fetchall()
+        return conn.execute('SELECT id, fact, created_at FROM cat_facts ORDER BY id DESC LIMIT ?', (limit,)).fetchall()
+
+
 
 def get_random_fact() -> Optional[str]:
     with get_connection() as conn:
