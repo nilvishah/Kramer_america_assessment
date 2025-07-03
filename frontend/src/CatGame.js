@@ -4,7 +4,8 @@ import pawImg from './assets/paw.svg';       // black paw icon to click
 import catFace from './assets/cat-face.png'; // floating bubble icon
 import { useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
-
+import Lottie from 'lottie-react';
+import catwalk2 from './assets/cat-walk2.json'; 
 
 const NUM_BUBBLES = 20;
 
@@ -90,6 +91,40 @@ const CatGame = () => {
           </div>
         );
       })}
+      <Lottie
+        animationData={catwalk2}
+        loop
+        style={{
+          width: 120,
+          height: 120,
+          position: 'absolute',
+          bottom: 0,
+          left: '-160px',
+          animation: 'walk 14s linear infinite',
+          zIndex: 0,
+        }}
+      />
+
+      <style>
+        {`
+          @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+          }
+
+          @keyframes walk {
+            0% { left: -160px; }
+            100% { left: 100%; }
+          }
+
+          @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0); }
+          }
+        `}
+      </style>
+
     </div>
   );
 };
