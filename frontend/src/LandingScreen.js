@@ -66,6 +66,7 @@ const LandingScreen = () => {
         <div style={{ display: 'flex', gap: '2rem', marginBottom: '2rem', zIndex: 1 }}>
           <button onClick={() => setAnswer("yes")} style={buttonStyle('#6366f1')}>Yes 😺</button>
           <button onClick={() => setAnswer("no")} style={buttonStyle('#ef4444')}>No 😿</button>
+          <button onClick={() => navigate('/random-fact')} style={buttonStyle('#10b981')}>Maybe 🤔</button>
         </div>
       )}
 
