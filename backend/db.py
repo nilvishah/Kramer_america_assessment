@@ -1,3 +1,11 @@
+def update_fact(fact_id: int, new_fact: str) -> bool:
+    try:
+        with get_connection() as conn:
+            cur = conn.execute('UPDATE cat_facts SET fact = ? WHERE id = ?', (new_fact, fact_id))
+            conn.commit()
+            return cur.rowcount > 0
+    except sqlite3.IntegrityError:
+        return False
 def clear_facts():
     with get_connection() as conn:
         conn.execute('DELETE FROM cat_facts')
