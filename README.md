@@ -1,6 +1,3 @@
-Here’s a clean, structured **README.md** for your project based on everything you shared:
-
----
 
 # 🐱 Cat Fact Tracker
 
@@ -79,38 +76,6 @@ If you want to skip manual setup, use **Docker Compose**:
 docker-compose up --build
 ```
 
-
-```yaml
-version: "3.8"
-services:
-  backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    environment:
-      - REDIS_HOST=redis
-    volumes:
-      - ./backend/cat_facts.db:/app/cat_facts.db
-    ports:
-      - "8000:8000"
-
-  frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-      args:
-        REACT_APP_API_URL: http://localhost:8000
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-```
-
 ---
 
 ## ✅ Features Summary
@@ -140,5 +105,3 @@ docker-compose.yml
 * The **likes** are stored in the backend and can be unliked.
 * CSV export works from the `/tracker` page.
 * All routes are easily accessible via the navigation choices.
-
----
