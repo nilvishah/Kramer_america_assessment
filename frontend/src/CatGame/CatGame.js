@@ -1,56 +1,61 @@
 import React, { useState, useEffect } from 'react';
-import './CatGame.css';
-import pawImg from '../assets/paw.svg';       // black paw icon to click
-import catFace from '../assets/cat-face.png'; // floating bubble icon
 import { useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import Lottie from 'lottie-react';
-import catwalk2 from '../assets/cat-walk2.json'; 
-import crabAnim from '../assets/crab.json';  // Make sure you have this Lottie file in your assets
 
+import './CatGame.css';
 
-const NUM_BUBBLES = 20;
+// Assets
+import pawImg from '../assets/paw.svg';          // Paw icon to click
+import catFace from '../assets/cat-face.png';    // Floating cat face bubbles
+import catwalk2 from '../assets/cat-walk2.json'; // Walking cat animation
+
+const NUM_BUBBLES = 20; // Number of floating bubbles
 
 const CatGame = () => {
-  const [score, setScore] = useState(0);
-  const [pawPos, setPawPos] = useState({ x: 100, y: 100 });
+  const [score, setScore] = useState(0);                // Track how many times paw is clicked
+  const [pawPos, setPawPos] = useState({ x: 100, y: 100 }); // Paw icon position
   const navigate = useNavigate();
 
+  // Handle clicking the paw
   const handlePawClick = () => {
-  if (score < 5) {
-    setScore(prev => prev + 1);
-    movePaw();
+    if (score < 5) {
+      setScore(prev => prev + 1);
+      movePaw();
 
-    // Heart/Confetti burst
-    confetti({
-      particleCount: 40,
-      spread: 70,
-      origin: {
-        x: pawPos.x / window.innerWidth,
-        y: pawPos.y / window.innerHeight
-      },
-      shapes: ['circle'],
-      scalar: 1.2,
-      colors: ['#ff6ec4', '#ffc1cc', '#fde2e2', '#ff9aa2'],
-    });
-  }
-};
+      // Confetti effect on each click
+      confetti({
+        particleCount: 40,
+        spread: 70,
+        origin: {
+          x: pawPos.x / window.innerWidth,
+          y: pawPos.y / window.innerHeight,
+        },
+        shapes: ['circle'],
+        scalar: 1.2,
+        colors: ['#ff6ec4', '#ffc1cc', '#fde2e2', '#ff9aa2'],
+      });
+    }
+  };
 
-
+  // Move the paw to a new random position
   const movePaw = () => {
     const x = Math.random() * (window.innerWidth - 60);
     const y = Math.random() * (window.innerHeight - 60);
     setPawPos({ x, y });
   };
 
+  // On mount: place paw somewhere random
   useEffect(() => {
-    movePaw(); // initial paw position
+    movePaw();
   }, []);
 
   return (
     <div className="bubble-bg">
+      {/* Game Title */}
       <h1 className="game-title">Click the paw 5 times to win!</h1>
-      {/* Paw to click */}
+
+      {/* Interactive Paw */}
       {score < 5 && (
         <img
           src={pawImg}
@@ -61,14 +66,14 @@ const CatGame = () => {
         />
       )}
 
-      {/* Final Button */}
+      {/* Final Button after winning */}
       {score >= 5 && (
         <button className="final-button" onClick={() => navigate('/')}>
           Okay okay, back →
         </button>
       )}
 
-      {/* Floating cat face bubbles only */}
+      {/* Floating Cat Face Bubbles */}
       {[...Array(NUM_BUBBLES)].map((_, i) => {
         const left = Math.random() * 100;
         const duration = 5 + Math.random() * 5;
@@ -92,6 +97,8 @@ const CatGame = () => {
           </div>
         );
       })}
+
+      {/* Walking Cat Animation */}
       <Lottie
         animationData={catwalk2}
         loop
@@ -106,6 +113,7 @@ const CatGame = () => {
         }}
       />
 
+      {/* Custom Animations */}
       <style>
         {`
           @keyframes fadeInUp {
@@ -125,7 +133,6 @@ const CatGame = () => {
           }
         `}
       </style>
-
     </div>
   );
 };

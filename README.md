@@ -1,4 +1,3 @@
-
 # 🐱 Cat Fact Tracker
 
 A fun and interactive **Cat Facts Tracker** built with **React (frontend)** and **FastAPI (backend)**, featuring playful choices, random cat facts, editing capabilities, and a mini-game. Designed for both entertainment and a practical showcase of full-stack development.
