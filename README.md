@@ -1,7 +1,3 @@
-Here’s a clean, structured **README.md** for your project based on everything you shared:
-
----
-
 # 🐱 Cat Fact Tracker
 
 A fun and interactive **Cat Facts Tracker** built with **React (frontend)** and **FastAPI (backend)**, featuring playful choices, random cat facts, editing capabilities, and a mini-game. Designed for both entertainment and a practical showcase of full-stack development.
@@ -71,48 +67,6 @@ If running the project locally (without Docker), create a `.env` file inside `/f
 
 ---
 
-## 🐳 Running with Docker (Recommended)
-
-If you want to skip manual setup, use **Docker Compose**:
-
-```bash
-docker-compose up --build
-```
-
-
-```yaml
-version: "3.8"
-services:
-  backend:
-    build:
-      context: .
-      dockerfile: backend/Dockerfile
-    environment:
-      - REDIS_HOST=redis
-    volumes:
-      - ./backend/cat_facts.db:/app/cat_facts.db
-    ports:
-      - "8000:8000"
-
-  frontend:
-    build:
-      context: .
-      dockerfile: frontend/Dockerfile
-      args:
-        REACT_APP_API_URL: http://localhost:8000
-    ports:
-      - "3000:80"
-    depends_on:
-      - backend
-
-  redis:
-    image: redis:alpine
-    ports:
-      - "6379:6379"
-```
-
----
-
 ## ✅ Features Summary
 
 | Feature      | Path           | Description                                |
@@ -140,5 +94,3 @@ docker-compose.yml
 * The **likes** are stored in the backend and can be unliked.
 * CSV export works from the `/tracker` page.
 * All routes are easily accessible via the navigation choices.
-
----
