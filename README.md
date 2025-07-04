@@ -103,4 +103,3 @@ docker-compose.yml
 
 * The **likes** are stored in the backend and can be unliked.
 * CSV export works from the `/tracker` page.
-* All routes are easily accessible via the navigation choices.
