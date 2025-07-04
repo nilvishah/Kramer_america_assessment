@@ -1,0 +1,174 @@
+.cat-tracker-container {
+  height: 100vh;
+  background: linear-gradient(to top right, #fff7fb, #e0f7fa);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Segoe UI', sans-serif;
+  padding: 0;
+  position: relative;
+}
+
+.cat-tracker-card {
+  width: 100%;
+  max-width: 600px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px #c7d2fe55;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+  padding: 0 2rem;
+}
+
+.cat-tracker-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  position: relative;
+}
+
+.cat-tracker-header h1 {
+  color: #6366f1;
+  font-weight: 700;
+  margin-right: 16px;
+}
+
+.cat-tracker-form {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.cat-tracker-form input {
+  flex: 1;
+  padding: 0.75rem 1rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 8px;
+  font-size: 16px;
+  background: #f1f5f9;
+  color: #334155;
+}
+
+.cat-tracker-form button {
+  border: none;
+  border-radius: 8px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.cat-tracker-form button:first-of-type {
+  background: #6366f1;
+  color: #fff;
+}
+
+.cat-tracker-form button:last-of-type {
+  background: #10b981;
+  color: #fff;
+}
+
+.cat-tracker-message {
+  margin-bottom: 16px;
+  text-align: center;
+  font-weight: 500;
+  color: #16a34a;
+}
+
+.cat-tracker-list {
+  flex: 1;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+}
+
+.cat-tracker-loading,
+.cat-tracker-empty {
+  text-align: center;
+  color: #64748b;
+  font-size: 16px;
+}
+
+.fact-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.fact-item {
+  background: #f1f5f9;
+  border-radius: 1rem;
+  margin-bottom: 1rem;
+  padding: 1.2rem 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.fact-edit input {
+  flex: 1;
+  font-size: 1.05rem;
+  padding: 0.3rem 0.5rem;
+  border: 1px solid #c7d2fe;
+  border-radius: 6px;
+  color: #334155;
+}
+
+.fact-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 14px;
+}
+
+.fact-actions {
+  display: flex;
+  gap: 0.75rem;
+}
+.fact-actions button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin: 0;
+  cursor: pointer;
+  font-size: 1.1rem; /* or adjust as needed */
+  color: inherit;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+
+.fact-enter {
+  opacity: 0;
+  transform: translateY(20px) scale(0.95);
+}
+
+.fact-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: opacity 350ms, transform 350ms;
+}
+
+.fact-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.fact-exit-active {
+  opacity: 0;
+  transform: translateY(-20px) scale(0.95);
+  transition: opacity 350ms, transform 350ms;
+}
+
+@keyframes walk {
+  0% {
+    left: -160px;
+  }
+  100% {
+    left: 100%;
+  }
+}

@@ -33,7 +33,39 @@ def create_table():
                 created_at DATE DEFAULT (DATE('now'))
             );
         ''')
+        conn.execute('''
+            CREATE TABLE IF NOT EXISTS liked_facts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                fact_id INTEGER UNIQUE,
+                liked_at DATE DEFAULT (DATETIME('now')),
+                FOREIGN KEY (fact_id) REFERENCES cat_facts(id) ON DELETE CASCADE
+            );
+        ''')
         conn.commit()
+def like_fact(fact_id: int) -> bool:
+    try:
+        with get_connection() as conn:
+            conn.execute('INSERT INTO liked_facts (fact_id) VALUES (?)', (fact_id,))
+            conn.commit()
+        return True
+    except sqlite3.IntegrityError:
+        return False
+
+def get_liked_facts() -> list:
+    with get_connection() as conn:
+        # Join to get fact text and created_at
+        return conn.execute('''
+            SELECT liked_facts.id, cat_facts.id as fact_id, cat_facts.fact, cat_facts.created_at, liked_facts.liked_at
+            FROM liked_facts
+            JOIN cat_facts ON liked_facts.fact_id = cat_facts.id
+            ORDER BY liked_facts.liked_at DESC
+        ''').fetchall()
+
+def unlike_fact(fact_id: int) -> bool:
+    with get_connection() as conn:
+        cur = conn.execute('DELETE FROM liked_facts WHERE fact_id = ?', (fact_id,))
+        conn.commit()
+        return cur.rowcount > 0
 
 def insert_fact(fact: str) -> bool:
     try:

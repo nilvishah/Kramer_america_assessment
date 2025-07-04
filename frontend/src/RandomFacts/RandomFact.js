@@ -1,21 +1,22 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import backgroundVideo from './assets/background.mp4';
-import paw from './assets/paw.svg';
+import backgroundVideo from '../assets/background.mp4'; // Ensure this path is correct
+import paw from '../assets/paw.svg'; // black paw icon to click
 import Lottie from 'lottie-react';
-import catwalk2 from './assets/cat-walk2.json'; 
+import catwalk2 from '../assets/cat-walk2.json'; 
 function RandomFact() {
   const [fact, setFact] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
   const navigate = useNavigate();
+  const API_URL = process.env.REACT_APP_API_URL || '';
 
   const fetchRandomFact = async () => {
     setLoading(true);
     setMessage('');
     setFact(null);
     try {
-      const res = await fetch('/catfacts/fetch_external', { method: 'POST' });
+      const res = await fetch(`${API_URL}/catfacts/fetch_external`, { method: 'POST' });
       const data = await res.json();
       if (res.ok && data && data.fact) {
         setFact(data.fact);
@@ -114,7 +115,7 @@ function RandomFact() {
           padding: 32,
           textAlign: 'center',
         }}>
-          <h2 style={{ color: '#6366f1', marginBottom: 16 }}>Get a Random Cat Fact</h2>
+          <h2 style={{ color: '#6366f1', marginBottom: 16 }}>Tell Me Something Purr-fect 🐾</h2>
           <button onClick={fetchRandomFact} style={{ background: '#10b981', color: '#fff', border: 'none', borderRadius: 8, padding: '0.75rem 1.5rem', fontWeight: 600, fontSize: 16, cursor: 'pointer', marginBottom: 24 }} disabled={loading}>
             {loading ? 'Fetching...' : 'Fetch New Cat Fact'}
           </button>
@@ -122,8 +123,8 @@ function RandomFact() {
           {message && <div style={{ marginTop: 16, color: '#dc2626' }}>{message}</div>}
           {/* Tracker redirect below fact/message */}
           <div style={{ marginTop: 36 }}>
-            <div style={{ fontSize: 17, color: '#334155', marginBottom: 12 }}>
-              If you are convinced enough, let's hop on to some more facts!
+            <div style={{ fontSize: 16, color: '#555', marginBottom: 12, fontStyle: 'italic' }}>
+              Feline intrigued? Let’s explore even more pawsome facts together!
             </div>
             <button
               onClick={() => navigate('/tracker')}
@@ -139,7 +140,7 @@ function RandomFact() {
                 boxShadow: '0 1px 4px rgba(0,0,0,0.07)'
               }}
             >
-              Go to Fact Tracker
+              Take Me to the Cat Tracker →
             </button>
           </div>
           
