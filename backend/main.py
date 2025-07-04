@@ -1,18 +1,14 @@
 from fastapi import FastAPI, Form, Path, Body
 from fastapi.middleware.cors import CORSMiddleware
-from db import create_table, get_all_facts, get_random_fact, insert_fact, delete_fact, update_fact
+from db import create_table, get_all_facts, get_random_fact, insert_fact, delete_fact, update_fact, like_fact, get_liked_facts, unlike_fact
+
+
 import json
 import redis
 from fastapi.responses import JSONResponse
 import requests
 
-
-
 app = FastAPI()
-
-# Connect to Redis (host='redis' for Docker Compose)
-r = redis.Redis(host='redis', port=6379, decode_responses=True)
-
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -20,6 +16,51 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# --- Likes Endpoints ---
+from fastapi import HTTPException
+
+@app.post("/likes")
+def like_a_fact(data: dict = Body(...)):
+    fact_id = data.get("fact_id")
+    if not fact_id:
+        raise HTTPException(status_code=400, detail="fact_id is required")
+    if like_fact(fact_id):
+        r.delete("all_facts")
+        return {"message": "Fact liked!"}
+    else:
+        return JSONResponse(status_code=409, content={"message": "Already liked or invalid fact."})
+
+@app.get("/likes")
+def get_likes():
+    likes = get_liked_facts()
+    # Each row: (like_id, fact_id, fact, created_at, liked_at)
+    return [
+        {
+            "like_id": row[0],
+            "fact_id": row[1],
+            "fact": row[2],
+            "created_at": row[3],
+            "liked_at": row[4],
+        }
+        for row in likes
+    ]
+
+@app.delete("/likes/{fact_id}")
+def unlike_a_fact(fact_id: int = Path(...)):
+    if unlike_fact(fact_id):
+        r.delete("all_facts")  # 🧹 Clear cache
+        return {"message": "Fact unliked!"}
+    else:
+        return JSONResponse(status_code=404, content={"message": "Like not found."})
+
+
+# Connect to Redis (host='redis' for Docker Compose, 'localhost' for local dev)
+import os
+REDIS_HOST = os.environ.get('REDIS_HOST', 'localhost')
+r = redis.Redis(host=REDIS_HOST, port=6379, decode_responses=True)
+
 
 
 @app.on_event("startup")
@@ -62,6 +103,7 @@ def add_cat_fact(fact: str = Form(...)):
     if not fact or not fact.strip():
         return JSONResponse(status_code=400, content={"message": "Fact cannot be empty."})
     if insert_fact(fact):
+        r.delete("all_facts")  # 🧹 Clear cache
         return {"message": "Fact added!"}
     else:
         return JSONResponse(status_code=409, content={"message": "Duplicate fact."})
@@ -70,6 +112,7 @@ def add_cat_fact(fact: str = Form(...)):
 @app.delete("/catfacts/{fact_id}")
 def delete_cat_fact(fact_id: int = Path(...)):
     if delete_fact(fact_id):
+        r.delete("all_facts")
         return {"message": "Fact deleted!"}
     else:
         return JSONResponse(status_code=404, content={"message": "Fact not found."})
@@ -81,6 +124,7 @@ def update_cat_fact(fact_id: int = Path(...), data: dict = Body(...)):
     if not new_fact:
         return JSONResponse(status_code=400, content={"message": "Fact cannot be empty."})
     if update_fact(fact_id, new_fact):
+        r.delete("all_facts")  # 🧹 Clear cache
         return {"success": True, "message": "Fact updated!"}
     else:
         return JSONResponse(status_code=409, content={"message": "Duplicate or not found."})

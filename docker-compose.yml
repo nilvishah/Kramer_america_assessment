@@ -4,6 +4,8 @@ services:
     build:
       context: .
       dockerfile: backend/Dockerfile
+    environment:
+    - REDIS_HOST=redis
     volumes:
       - ./backend/cat_facts.db:/app/cat_facts.db
     ports:
@@ -12,10 +14,13 @@ services:
     build:
       context: .
       dockerfile: frontend/Dockerfile
+      args:
+        REACT_APP_API_URL: http://localhost:8000
     ports:
       - "3000:80"
     depends_on:
       - backend
+    
   redis:
     image: redis:alpine
     ports:

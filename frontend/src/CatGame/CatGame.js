@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import './CatGame.css';
-import pawImg from './assets/paw.svg';       // black paw icon to click
-import catFace from './assets/cat-face.png'; // floating bubble icon
+import pawImg from '../assets/paw.svg';       // black paw icon to click
+import catFace from '../assets/cat-face.png'; // floating bubble icon
 import { useNavigate } from 'react-router-dom';
 import confetti from 'canvas-confetti';
 import Lottie from 'lottie-react';
-import catwalk2 from './assets/cat-walk2.json'; 
+import catwalk2 from '../assets/cat-walk2.json'; 
+import crabAnim from '../assets/crab.json';  // Make sure you have this Lottie file in your assets
+
 
 const NUM_BUBBLES = 20;
 
@@ -47,8 +49,7 @@ const CatGame = () => {
 
   return (
     <div className="bubble-bg">
-      <h1 className="game-title">Catch the paw!</h1>
-
+      <h1 className="game-title">Click the paw 5 times to win!</h1>
       {/* Paw to click */}
       {score < 5 && (
         <img

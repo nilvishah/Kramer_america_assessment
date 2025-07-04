@@ -60,6 +60,10 @@ const LandingScreen = () => {
       }}>
         Oh hello, you like cats?
       </h1>
+      <p style={{ color: '#888', marginTop: '-1rem', marginBottom: '1.5rem', fontStyle: 'italic' }}>
+        P.S. We know Alejandra’s cat would definitely say “Yes” 😺
+      </p>
+
 
       {/* Yes / No Buttons */}
       {!answer && (
