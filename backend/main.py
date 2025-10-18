@@ -165,3 +165,4 @@ def fetch_external_cat_fact():
         return JSONResponse(status_code=502, content={"message": "Failed to fetch from external API."})
     except Exception as e:
         return JSONResponse(status_code=500, content={"message": f"Error: {str(e)}"})
+        
