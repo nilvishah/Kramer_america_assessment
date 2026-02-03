@@ -105,4 +105,3 @@ def unlike_fact(fact_id: int) -> bool:
         cur = conn.execute('DELETE FROM liked_facts WHERE fact_id = ?', (fact_id,))
         conn.commit()
         return cur.rowcount > 0
-        
