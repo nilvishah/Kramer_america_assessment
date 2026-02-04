@@ -36,3 +36,4 @@ def export_to_csv(db_path=DB_PATH, csv_path=CSV_PATH):
 # Run when executed directly
 if __name__ == '__main__':
     export_to_csv()
+    
