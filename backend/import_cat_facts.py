@@ -42,4 +42,3 @@ def main():
 # Run this script directly
 if __name__ == '__main__':
     main()
-    
